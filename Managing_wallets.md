@@ -17,7 +17,7 @@ If the node is running on testnet network, `-testnet` parameter should be added.
 
 The `descriptors` parameter can be omitted if the intention is to create a legacy wallet.
 
-For now, the default is the legacy wallet, but that should change in the near future.
+For now, the default type is the legacy wallet, but that should change in the near future.
 
 By default, wallets will be create in the `~/.bitcoin/wallets/wallet_name` folder. If running on testnet, it will be created in `~/.bitcoin/testnet3/wallets/wallet_name`.
 
