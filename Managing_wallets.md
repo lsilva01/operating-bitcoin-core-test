@@ -59,7 +59,7 @@ In the RPC, the destination parameter must include the name of the file. Otherwi
 
 In the GUI, the wallet is selected in the `Wallet` drop-down list in the upper right corner. If this list is not present, the wallet can be loaded in `File` ->`Open wallet` if necessary. Then, the backup can be done in `File` -> `Backup Wallet...`.
 
-This backup file should be stored on offline devices only, such as on a USB drive or an external hard drive. They should be reliable enough to work in an emergency and be free from malware. Backup files can be regularly tested to avoid problems in the future.
+This backup file can be stored on one or multiple offline devices. They must be reliable enough to work in an emergency, never have connected to online devices, and be malware free. Backup files can be regularly tested to avoid problems in the future.
 
 If the wallet and backup are lost for any reason, the bitcoins related to this wallet will become permanently inaccessible.
 
