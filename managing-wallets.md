@@ -5,17 +5,17 @@
 ### 1.1 Creating the Wallet
 
 Since version 0.21, Bitcoin Core no longer has a default wallet.
-Wallets can be created with the `createwallet` RPC. More information about this command may be found by running `bitcoin-cli help createwallet`.
-
-The following command, for example, creates a descriptor wallet:
-
-`$ bitcoin-cli -named createwallet wallet_name="wallet-01" descriptors=true`
+Wallets can be created with the `createwallet` RPC or with the `Create wallet` GUI menu item.
 
 In the GUI, the `Create a new wallet` button is displayed on the main screen when there is no wallet loaded. Alternatively, there is the option `File` ->`Create wallet`.
 
-The `descriptors` parameter can be omitted if the intention is to create a legacy wallet.
+The following command, for example, creates a descriptor wallet. More information about this command may be found by running `bitcoin-cli help createwallet`.
 
-For now, the default type is the legacy wallet, but that should change in the near future.
+```
+$ bitcoin-cli -named createwallet wallet_name="wallet-01" descriptors=true
+```
+
+The `descriptors` parameter can be omitted if the intention is to create a legacy wallet. For now, the default type is the legacy wallet, but that is expected to change in a future release.
 
 By default, wallets are created in the `wallets` folder of the data directory, which varies by operating system, as shown below. The user can change the default by using the `-datadir` or `-walletdir` initialization parameters.
 
@@ -29,17 +29,23 @@ By default, wallets are created in the `wallets` folder of the data directory, w
 
 The `wallet.dat` file is not encrypted by default and is, therefore, vulnerable if an attacker gains access to the device where the wallet or the backups are stored.
 
-One way to mitigate this problem is to encrypt the wallet. However, this solution significantly increases the risk of losing coins due to forgotten passphrases. There is no way to recover a passphrase. This tradeoff should be well thought out by the user.
+Wallet encryption may prevent unauthorized access. However, this significantly increases the risk of losing coins due to forgotten passphrases. There is no way to recover a passphrase. This tradeoff should be well thought out by the user.
+
+Wallet encryption may also not protect against more sophisticated attacks. An attacker can, for example, obtain the passphrase by installing a keylogger on the user's machine.
 
 After encrypting the wallet or changing the passphrase, a new backup needs to be created immediately. The reason is that the keypool is flushed and a new HD seed is generated after encryption. Any bitcoins received by the new seed cannot be recovered from the previous backups.
 
 The wallet's private key may be encrypted with the following command:
 
-`$ bitcoin-cli -rpcwallet="wallet-01" encryptwallet "passphrase"`
+```
+$ bitcoin-cli -rpcwallet="wallet-01" encryptwallet "passphrase"
+```
 
 Once encrypted, the passphrase can be changed with the `walletpassphrasechange` command.
 
-`$ bitcoin-cli -rpcwallet="wallet-01" walletpassphrasechange "oldpassphrase" "newpassphrase"`
+```
+$ bitcoin-cli -rpcwallet="wallet-01" walletpassphrasechange "oldpassphrase" "newpassphrase"
+```
 
 The argument passed to `-rpcwallet` is the name of the wallet to be encrypted.
 
@@ -47,7 +53,9 @@ Only the wallet's private key is encrypted. All other wallet information, such a
 
 The wallet's private key can also be encrypted in the `createwallet` command via the `passphrase` argument:
 
-`$ bitcoin-cli -named createwallet wallet_name="wallet-01" descriptors=true passphrase="passphrase"`
+```
+$ bitcoin-cli -named createwallet wallet_name="wallet-01" descriptors=true passphrase="passphrase"
+```
 
 Note that if the passphrase is lost, all the coins in the wallet will also be lost forever.
 
@@ -66,7 +74,9 @@ To unlock the wallet and allow it to run these operations, the `walletpassphrase
 
 This command takes the passphrase and an argument called `timeout`, which specifies the time in seconds that the wallet decryption key is stored in memory. After this period expires, the user needs to execute this RPC again.
 
-`$ bitcoin-cli -rpcwallet="wallet-01" walletpassphrase "passphrase" 120`
+```
+$ bitcoin-cli -rpcwallet="wallet-01" walletpassphrase "passphrase" 120
+```
 
 In the GUI, there is no specific menu item to unlock the wallet. When the user sends bitcoins, the passphrase will be prompted automatically.
 
@@ -76,13 +86,17 @@ To backup the wallet, the `backupwallet` RPC or the `Backup Wallet` GUI menu ite
 
 In the RPC, the destination parameter must include the name of the file. Otherwise, the command will return an error message like "Error: Wallet backup failed!" for descriptor wallets. If it is a legacy wallet, it will be copied and a file will be created with the default file name `wallet.dat`.
 
-`$ bitcoin-cli -rpcwallet="wallet-01" backupwallet /home/node01/Backups/backup-01.dat`
+```
+$ bitcoin-cli -rpcwallet="wallet-01" backupwallet /home/node01/Backups/backup-01.dat
+```
 
 In the GUI, the wallet is selected in the `Wallet` drop-down list in the upper right corner. If this list is not present, the wallet can be loaded in `File` ->`Open wallet` if necessary. Then, the backup can be done in `File` -> `Backup Wallet...`.
 
-This backup file can be stored on one or multiple offline devices, which must be reliable enough to work in an emergency, never be connected to online devices, and be malware free. Backup files can be regularly tested to avoid problems in the future.
+This backup file can be stored on one or multiple offline devices, which must be reliable enough to work in an emergency and be malware free. Backup files can be regularly tested to avoid problems in the future.
 
-If the wallet and backup are lost for any reason, the bitcoins related to this wallet will become permanently inaccessible.
+If the computer has malware, it can compromise the wallet when recovering the backup file. One way to minimize this is to not connect the backup to an online device.
+
+If both the wallet and all backups are lost for any reason, the bitcoins related to this wallet will become permanently inaccessible.
 
 ### 1.5 Backup Frequency
 
@@ -96,18 +110,16 @@ Wallets created before version 0.13 are not HD and must be backed up every 100 k
 
 ### 1.6 Restoring the Wallet From a Backup
 
-To restore a wallet, first a directory must be created in the `walletdir` with a name that the user wants the wallet to be named, and then copy the backup file into that directory. The copied file must be named `wallet.dat`.
-
-Then the user can load the wallet passing the name of the newly created directory as parameter.
+To restore a wallet, the `restorewallet` RPC must be used.
 
 ```
-$ mkdir ~/.bitcoin/wallets/restored-wallet
-$ cp -n ~/Backups/backup-01.dat ~/.bitcoin/wallets/restored-wallet/wallet.dat
-$ bitcoin-cli loadwallet "restored-wallet"
+$ bitcoin-cli restorewallet "restored-wallet" /home/node01/Backups/backup-01.dat
 ```
 
 After that, `getwalletinfo` can be used to check if the wallet has been fully restored.
 
-`$ bitcoin-cli -rpcwallet="restored-wallet" getwalletinfo`
+```
+$ bitcoin-cli -rpcwallet="restored-wallet" getwalletinfo
+```
 
 The restored wallet can also be loaded in the GUI via `File` ->`Open wallet`.
