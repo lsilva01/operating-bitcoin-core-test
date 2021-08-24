@@ -2,6 +2,8 @@
 
 Currently, it is possible to create a multig wallet using Bitcoin Core Core only.
 
+Although there is already a brief explanation and a functional test about the multisig steps implemented in PR 22067, this tutorial proposes to use the signet, bringing the reader closer to a real environment (instead of regtest) and explaining some functions in more detail.
+
 Before starting this tutorial, start the bitcoin node on the signet network.
 
 ```bash
