@@ -75,6 +75,8 @@ multisig_desc="[$multisig_ext_desc, $multisig_int_desc]"
 
 Note that at least two descriptors are usually used, one for internal derivation paths and external ones. There are discussions about eliminating this redundancy, as can been seen in the issue [#17190](https://github.com/bitcoin/bitcoin/issues/17190).
 
+<!-- a -->
+
 After creating the descriptors, it is necessary to add the checksum, which is required by the `importdescriptors` RPC.
 
 The checksum for a descriptor without one can be computed using the `getdescriptorinfo` RPC. The response has the `descriptor` field, which is the descriptor with checksum added.
