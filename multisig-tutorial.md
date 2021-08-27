@@ -83,21 +83,19 @@ multisig_desc="[$multisig_ext_desc, $multisig_int_desc]"
 
 Note that at least two descriptors are usually used, one for internal derivation paths and external ones. There are discussions about eliminating this redundancy, as can been seen in the issue [#17190](https://github.com/bitcoin/bitcoin/issues/17190).
 
-<!-- a -->
-
 After creating the descriptors, it is necessary to add the checksum, which is required by the `importdescriptors` RPC.
 
-The checksum for a descriptor without one can be computed using the `getdescriptorinfo` RPC. The response has the `descriptor` field, which is the descriptor with checksum added.
+The checksum for a descriptor without one can be computed using the `getdescriptorinfo` RPC. The response has the `descriptor` field, which is the descriptor with the checksum added.
 
-There are other fields that can be added to th descriptors:
+There are other fields that can be added to the descriptors:
 
-* `active`: Set the descriptor to be the active one for the corresponding output type (`wsh`, in this case).
-* `internal`: Whether matching outputs should be treated as not incoming payments (e.g. change).
-* `timestamp`: Time from which to start rescanning the blockchain for the descriptor, in UNIX epoch time.
+* `active`: Sets the descriptor to be the active one for the corresponding output type (`wsh`, in this case).
+* `internal`: Indicates whether matching outputs should be treated as something other than incoming payments (e.g. change).
+* `timestamp`: Sets the time from which to start rescanning the blockchain for the descriptor, in UNIX epoch time.
 
 Documentation for these and other parameters can be found by typing `./src/bitcoin-cli help importdescriptors`.
 
-`multisig_desc` concatenates external and internal descriptors in a JSON array and will be used to create the multisig wallet.
+`multisig_desc` concatenates external and internal descriptors in a JSON array and then it will be used to create the multisig wallet.
 
 ### 1.4 Create the Multisig Wallet
 
@@ -123,12 +121,14 @@ receiving_address=$(./src/bitcoin-cli -signet -rpcwallet="multisig_wallet_01" ge
 ./contrib/signet/getcoins.py -a $receiving_address
 ```
 
-The wallet can receive signet coins generating a new address and passing it as parameters to `getcoins.py` script.
+The wallet can receive signet coins by generating a new address and passing it as parameters to `getcoins.py` script.
 
-If the script throws an error such as `Captcha required (reload page)`, the url in script can be access directy.
+If the script throws an error such as `Captcha required (reload page)`, the url in the script can be accessed directly.
 At time of writing, the url is [`https://signetfaucet.com`](https://signetfaucet.com).
 
-Coins received by the wallet can only be spent after 1 confirmation. It is necessary to wait for the time for a new block to be mined to continue.
+Coins received by the wallet must have at least 1 confirmation before they can be spent. It is necessary to wait for a new block to be mined before continuing.
+
+<!-- a -->
 
 The `getbalances` RPC may be used to check the balance. Coins with `trusted` status can be spent.
 
