@@ -1,4 +1,4 @@
-# Multisign
+# 1. Multisig
 
 Currently, it is possible to create a multig wallet using Bitcoin Core only.
 
@@ -10,7 +10,9 @@ Before starting this tutorial, start the bitcoin node on the signet network.
 ./src/bitcoind -signet
 ```
 
-### 1.1 Basic Multisig Workflow
+This tutorial also uses [jq](https://github.com/stedolan/jq) JSON processor to process the results from RPC and stores the relevant values in bash variables. This makes the tutorial reproducible and easier to follow the step by step.
+
+## 1.1 Basic Multisig Workflow
 
 1. For a 2-of-3 multisig, create 3 descriptor wallets. It is important that they are of the descriptor type in order to retrieve the wallet descriptors. These wallets contain HD seed and private keys, which will be used to sign the PSBTs and derive the xpub.
 
@@ -122,6 +124,12 @@ At time of writing, the url is [`https://signetfaucet.com`](https://signetfaucet
 
 Coins received by the wallet can only be spent after 1 confirmation. It is necessary to wait for the time for a new block to be mined to continue.
 
+The `getbalances` RPC may be used to check the balance. Coins with `trusted` status can be spent.
+
+```bash
+./src/bitcoin-cli -signet -rpcwallet="multisig_wallet_01" getbalances
+```
+
 6. Create a PSBT
 
 ```bash
@@ -131,7 +139,7 @@ amount=$(echo "$balance * 0.8" | bc -l | sed -e 's/^\./0./' -e 's/^-\./-0./')
 
 destination_addr=$(./src/bitcoin-cli -signet -rpcwallet="participant_1" getnewaddress)
 
-funded_psbt=$(./src/bitcoin-cli -signet -named -rpcwallet="multisig_wallet_01" walletcreatefundedpsbt outputs="{\"$destination_addr\": $amount}" options='{"feeRate": 0.00010}' | jq -r '.psbt')
+funded_psbt=$(./src/bitcoin-cli -signet -named -rpcwallet="multisig_wallet_01" walletcreatefundedpsbt outputs="{\"$destination_addr\": $amount}" | jq -r '.psbt')
 ```
 
 Multisig wallets cannot create and sign transactions directly, like it happens in the singlesig ones because it requires the signatures of the co-signers.
