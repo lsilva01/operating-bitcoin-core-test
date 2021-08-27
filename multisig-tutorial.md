@@ -1,4 +1,4 @@
-# 1. Multisig
+# 1. Multisig Tutorial
 
 Currently, it is possible to create a multig wallet using Bitcoin Core only.
 
