@@ -14,7 +14,9 @@ This tutorial also uses [jq](https://github.com/stedolan/jq) JSON processor to p
 
 ## 1.1 Basic Multisig Workflow
 
-1. For a 2-of-3 multisig, create 3 descriptor wallets. It is important that they are of the descriptor type in order to retrieve the wallet descriptors. These wallets contain HD seed and private keys, which will be used to sign the PSBTs and derive the xpub.
+### 1.1 Create the Descriptor Wallets
+
+For a 2-of-3 multisig, create 3 descriptor wallets. It is important that they are of the descriptor type in order to retrieve the wallet descriptors. These wallets contain HD seed and private keys, which will be used to sign the PSBTs and derive the xpub.
 
 ```bash
 for ((n=1;n<=3;n++))
@@ -23,7 +25,9 @@ do
 done
 ```
 
-2. Extract the xpub of each wallet. To do this, the `listdescriptors` RPC is used. By default, Bitcoin Core single-sig wallets are created using path `m/44'/1'/0'` for PKH, `m/84'/1'/0'` for WPKH and `m/49'/1'/0'` for P2WPKH-nested-in-P2SH based accounts. Each of them uses the chain 0 for external addresses and chain 1 for internal ones, as shown in the example below.
+### 1.2 Create the Descriptor Wallets
+
+Extract the xpub of each wallet. To do this, the `listdescriptors` RPC is used. By default, Bitcoin Core single-sig wallets are created using path `m/44'/1'/0'` for PKH, `m/84'/1'/0'` for WPKH and `m/49'/1'/0'` for P2WPKH-nested-in-P2SH based accounts. Each of them uses the chain 0 for external addresses and chain 1 for internal ones, as shown in the example below.
 
 ```
 wpkh([1004658e/84'/1'/0']tpubDCBEcmVKbfC9KfdydyLbJ2gfNL88grZu1XcWSW9ytTM6fitvaRmVyr8Ddf7SjZ2ZfMx9RicjYAXhuh3fmLiVLPodPEqnQQURUfrBKiiVZc8/0/*)#g8l47ngv
@@ -58,7 +62,9 @@ At the time of writing, there is no way to extract a specific path from wallets 
 
 [PR #22341](https://github.com/bitcoin/bitcoin/pull/22341), which is still under development, introduces a new wallet RPC `getxpub`. It takes a BIP32 path as an argument and returns the xpub, along with the master key fingerprint.
 
-3. Define the external and internal multisig descriptors, add the checksum and then, join both in a JSON array.
+### 1.3 Define the Multisig Descriptors
+
+Define the external and internal multisig descriptors, add the checksum and then, join both in a JSON array.
 
 ```bash
 external_desc="wsh(sortedmulti(2,${xpubs["external_xpub_1"]},${xpubs["external_xpub_2"]},${xpubs["external_xpub_3"]}))"
@@ -93,7 +99,7 @@ Documentation for these and other parameters can be found by typing `./src/bitco
 
 `multisig_desc` concatenates external and internal descriptors in a JSON array and will be used to create the multisig wallet.
 
-4. Create the multisig wallet
+### 1.4 Create the Multisig Wallet
 
 ```bash
 ./src/bitcoin-cli -signet -named createwallet wallet_name="multisig_wallet_01" disable_private_keys=true blank=true descriptors=true
@@ -109,7 +115,7 @@ Then import the descriptors created in the previous step using the `importdescri
 
 After that, `getwalletinfo` can be used to check if the wallet was created successfully.
 
-5. Fund the wallet
+### 1.5 Fund the wallet
 
 ```bash
 receiving_address=$(./src/bitcoin-cli -signet -rpcwallet="multisig_wallet_01" getnewaddress)
@@ -130,7 +136,7 @@ The `getbalances` RPC may be used to check the balance. Coins with `trusted` sta
 ./src/bitcoin-cli -signet -rpcwallet="multisig_wallet_01" getbalances
 ```
 
-6. Create a PSBT
+### 1.6 Create a PSBT
 
 ```bash
 balance=$(./src/bitcoin-cli -signet -rpcwallet="multisig_wallet_01" getbalance)
@@ -154,7 +160,7 @@ The `walletcreatefundedpsbt` RPC is used to create and fund a transaction in the
 
 The `send` RPC can also return a PSBT if more signatures are needed to sign the transaction.
 
-7. Decode or Analyze the PSBT
+### 1.7 Decode or Analyze the PSBT
 
 ```bash
 ./src/bitcoin-cli -signet decodepsbt $funded_psbt
@@ -166,7 +172,7 @@ Optionally, the PSBT can be decoded to a JSON format using `decodepsbt` RPC.
 
 The `analyzepsbt` RPC analyzes and provides information about the current status of a PSBT and its inputs, eg missing signatures.
 
-8. Update the PSBT
+### 1.8 Update the PSBT
 
 ```bash
 psbt_1=$(./src/bitcoin-cli -signet -rpcwallet="participant_1" walletprocesspsbt $funded_psbt | jq '.psbt')
@@ -178,7 +184,7 @@ In the code above, two PSBTs are created. One signed by `participant_1` wallet a
 
 The `walletprocesspsbt` is used by the wallet to sign a PSBT.
 
-9. Combine the PSBT
+### 1.9 Combine the PSBT
 
 ```bash
 combined_psbt=$(./src/bitcoin-cli -signet combinepsbt "[$psbt_1, $psbt_2]")
@@ -190,7 +196,7 @@ There is an RPC called `joinpsbts`, but it has a different purpose than `combine
 
 In the example above, PSBTs are the same, but signed by different participants. If the user tries to merge them, the error `Input txid:pos exists in multiple PSBTs` is returned. To be able to merge PSBTs into one, they must have different inputs and outputs.
 
-10. Finalize and Broadcast the PSBT
+### 1.10 Finalize and Broadcast the PSBT
 
 ```bash
 finalized_psbt_hex=$(./src/bitcoin-cli -signet finalizepsbt $combined_psbt | jq -r '.hex')
@@ -202,7 +208,7 @@ The `finalizepsbt` RPC is used to produce a network serialized transaction which
 
 It checks that all inputs have complete scriptSigs and scriptWitnesses and, if so, encodes them into network serialized transactions.
 
-11. Alternative Workflow (PSBT sequential signatures)
+### 1.11 Alternative Workflow (PSBT sequential signatures)
 
 ```bash
 psbt_1=$(./src/bitcoin-cli -signet -rpcwallet="participant_1" walletprocesspsbt $funded_psbt | jq -r '.psbt')
@@ -214,6 +220,6 @@ finalized_psbt_hex=$(./src/bitcoin-cli -signet finalizepsbt $psbt_2 | jq -r '.he
 ./src/bitcoin-cli -signet sendrawtransaction $finalized_psbt_hex
 ```
 
-Instead of each wallet signing the original PSBT and combining them later, the wallets can also sign the PSBTs sequentially.
+Instead of each wallet signing the original PSBT and combining them later, the wallets can also sign the PSBTs sequentially. This is less scalable than the previously presented parallel workflow, but it works.
 
 After that, the rest of the process is the same: the PSBT is finalized and transmitted to the network.
