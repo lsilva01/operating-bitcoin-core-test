@@ -128,8 +128,6 @@ At time of writing, the url is [`https://signetfaucet.com`](https://signetfaucet
 
 Coins received by the wallet must have at least 1 confirmation before they can be spent. It is necessary to wait for a new block to be mined before continuing.
 
-<!-- a -->
-
 The `getbalances` RPC may be used to check the balance. Coins with `trusted` status can be spent.
 
 ```bash
@@ -156,7 +154,9 @@ Te current PSBT version (v0) is defined in [BIP 174](https://github.com/bitcoin/
 
 For simplicity, the destination address is taken from the `participant_1` wallet in the code above, but it can be any valid bitcoin address.
 
-The `walletcreatefundedpsbt` RPC is used to create and fund a transaction in the PSBT format. It is the first step in creating the PSBT.
+The `walletcreatefundedpsbt` RPC is used to create and fund a transaction in the PSBT format. It is the first step in creating the PSBT.\
+
+There is also the `createpsbt` RPC, which serves the same purpose, but it has no access to the wallet or to the UTXO set. It is functionally the same as `createrawtransaction` and just drops the raw transaction into an otherwise blank PSBT. [[source](https://bitcointalk.org/index.php?topic=5131043.msg50573609#msg50573609)] In most cases, `walletcreatefundedpsbt` solves the problem.
 
 The `send` RPC can also return a PSBT if more signatures are needed to sign the transaction.
 
