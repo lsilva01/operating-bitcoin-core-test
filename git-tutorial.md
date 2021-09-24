@@ -30,7 +30,7 @@ If the intention is just review or study the code, you can clone the original re
 git clone https://github.com/bitcoin/bitcoin.git [<directory>]
 ```
 
-### 1.1.3 Add Remote Repository
+### 1.1.3 Add Remote Repository (Upstream)
 
 If you intend to open pull requests and contribute to original code, you also need to add the original repository.
 
@@ -182,14 +182,56 @@ After saving and closing the text editor, git will remove all these commits from
 
 ### 1.2.3 Using git rebase --autosquash
 
+The squashing can also be performed in a more automated manner by using the `--autosquash` option of `git rebase` in combination with the `--fixup` option of `git commit`:
+
+```
+git commit -a --fixup HEAD^
+git rebase -i --autosquash HEAD~3
+```
+This automatically generate the rebase script with commits reordered and actions set up.
+
+`HEAD^` means the first immediate parent of the tip of the current branch. `HEAD^` is short for `HEAD^1`. This is usually used on merge commits.
+
+`HEAD ~ 3` gets the last 3 commits. This value can be changed to an arbitrary number of commits
+
+### 1.2.4 Fetching Upstream Commits
+
+When developing new features, it is common to need to fetch new commits from `bitcoin:master` and rewriting the local master with upstream's master.
+
+To do this, the upstream repository must have already been configured previously, as shown in step 1.1.3.
+
+The commands below do this merge.
+
+```
+git fetch upstream
+git rebase upstream/master
+```
+
+To push the update to master, it may be necessary to force the push with `--force` (or `-f`).
+
+```
+git push origin master --force
+```
+
+## 1.3 Writing Good Commit messages
+
 
 
 ## 1.5 Sources:
+
+
+[Git Rebase in Depth](https://git-rebase.io/)
 
 [How to create a pull request in GitHub](https://opensource.com/article/19/7/create-pull-request-github)
 
 [How to Review Pull Requests in Bitcoin Core](https://jonatack.github.io/articles/how-to-review-pull-requests-in-bitcoin-core)
 
+[How to update a forked repo with git rebase](https://medium.com/@topspinj/how-to-git-rebase-into-a-forked-repo-c9f05e821c8a)
+
 [Git Reference](https://git-scm.com/docs/)
 
+[The life-changing magic of git rebase -i](https://opensource.com/article/20/4/git-rebase-i)
+
 [Saving Changes](https://www.atlassian.com/git/tutorials/saving-changes)
+
+[What's the difference between HEAD^ and HEAD~ in Git?](https://stackoverflow.com/a/2222920)
