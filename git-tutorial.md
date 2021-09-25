@@ -202,23 +202,172 @@ To do this, the upstream repository must have already been configured previously
 
 The commands below do this merge.
 
-```
-git fetch upstream
-git rebase upstream/master
+```bash
+$ git fetch upstream
+$ git rebase upstream/master
 ```
 
 To push the update to master, it may be necessary to force the push with `--force` (or `-f`).
 
-```
-git push origin master --force
+```bash
+$ git push origin master --force
 ```
 
 ## 1.3 Writing Good Commit messages
 
+Good commit messages is one of most important aspect for a project maintainability. They allow new contributors to retrieve the context of a change and understand _what_ has changed and _why_.
+
+Therefore, a developer should not neglect good practices when writing commit messages. Some of them will be presented below.
+
+### 1.3.1 Separate subject from body with a blank line
+
+From the `git commit` manpage:
+
+ Though not required, it’s a good idea to begin the commit message with a single short (less than 50 character) line summarizing the change, followed by a blank line and then a more thorough description. The text up to the first blank line in a commit message is treated as the commit title, and that title is used throughout Git.
+
+
+Firstly, not every commit requires both a subject and a body. Sometimes a single line is fine, especially when the change is so simple that no further context is necessary. For example:
+
+```
+Some small improvements to release notes
+```
+
+This message can be found in the [commit 9f9ffe5](https://github.com/bitcoin/bitcoin/commit/9f9ffe5).
+
+Nothing more need be said; if the reader wonders what the improvements were, she can simply take a look at the change itself, i.e. use `git show` or `git diff` or `git log -p`.
+
+If the commit message is simple, just add the `-m` option to `git commit`:
+
+```bash
+$ git commit -m "Some small improvements to release notes"
+```
+
+However, when a commit deserves a little explanation and context, it's better to write a body. For example:
+
+```
+doc: Stop nixing `-` in manual pages
+
+The version replacement here is not working anyway, not just that but it
+is actively harmful as it removes all `-` from the text. So remove that
+line. See discussion in #22681.
+```
+
+Commit messages with bodies are not so easy to write with the `-m` option. It's better off to write them in a proper text editor.
+
+
+Note that there is a blank line between the title and the body.
+
+This entire message will be shown in the result of `git log` command.
+
+`git log --oneline` prints out just the subject line and `git shortlog` groups commits by user, again showing just the subject line for concision.
+
+### 1.3.2 Limit the subject line to 50 characters
+
+50 characters is not a hard limit, just a rule of thumb. Keeping subject lines at this length ensures that they are readable, and forces the author to think for a moment about the most concise way to explain what’s going on.
+
+GitHub’s UI will warn users if they exceed the 50 character limit and will truncate any subject line longer than 72 characters with an ellipsis.
+
+So shoot for 50 characters, but consider 72 the hard limit.
+
+Note that some of the last commits prior to v22 follow this rule:
+
+```
+$ git log --oneline
+
+a0988140b (HEAD, tag: v22.0, origin/22.x) Merge bitcoin/bitcoin#22921: Some small improvements to release notes
+9f9ffe5bb Some small improvements to release notes
+f75615ebd doc: Manual pages update for 22.0 final
+afbee409b build: Bump version to 22.0 final
+03f142278 Merge bitcoin/bitcoin#22857: [22.x] Backports
+fbf498d26 Merge bitcoin/bitcoin#22920: doc: Move 22.0 release notes from wiki
+d44797241 doc: Move 22.0 release notes from wiki
+303bc8a06 guix/prelude: Override VERSION with FORCE_VERSION
+0640bf5c8 doc: mention bech32m/BIP350 in doc/descriptors.md
+86de56776 (tag: v22.0rc3) doc: Manual pages update for rc3
+c1c79f4c8 doc: Stop nixing `-` in manual pages
+f95b655ba Improve doc/i2p.md regarding I2P router options/versions
+59d4afc27 build: Bump version to 22.0rc3
+```
+
+### 1.3.3 Capitalize the subject line
+
+This is as simple as it sounds. Begin all subject lines with a capital letter.
+
+Note that most of the above commit messages start with a capital letter, except when prefixing the area affected by the commit. Valid areas such as:
+
+* `consensus` for changes to consensus critical code
+* `doc` for changes to the documentation
+* `qt` or `gui` for changes to bitcoin-qt
+* `log` for changes to log messages
+* `mining` for changes to the mining code
+* `net` or `p2p` for changes to the peer-to-peer network code
+* `refactor` for structural changes that do not change behavior
+* `rpc`, `rest` or `zmq` for changes to the RPC, REST or ZMQ APIs
+* `script` for changes to the scripts and tools
+* `test`, `qa` or `ci` for changes to the unit tests, QA tests or CI code
+* `util` or `lib` for changes to the utils or libraries
+* `wallet` for changes to the wallet code
+* `build` for changes to the GNU Autotools or reproducible builds
+
+### 1.3.4 Do not end the subject line with a period
+
+Trailing punctuation is unnecessary in subject lines. Besides, space is precious when you’re trying to keep them to 50 chars or less.
+
+This can be seen in the above commit message headers.
+
+### 1.3.5 Use the imperative mood in the subject line
+
+Imperative mood just means “spoken or written as if giving a command or instruction”. A few examples:
+
+* Remove extra \r from all.SHA256SUMS line ending
+* Add a note that codesigners need to rebuild after tagging
+* Make all.SHA256SUMS rather than codesigned.SHA256SUMS
+
+The use of the imperative is important only in the subject line. This restriction can be relaxed when writing the body.
+
+### 1.3.6 Wrap the body at 72 characters
+
+Git never wraps text automatically. When writing the body of a commit message, mind its right margin, and wrap text manually.
+
+The recommendation is to do this at 72 characters, so that Git has plenty of room to indent text while still keeping everything under 80 characters overall.
+
+### 1.3.7 Use the body to explain what and why vs. how
+
+The [commit eb0b56b](https://github.com/bitcoin/bitcoin/commit/eb0b56b19017ab5c16c745e6da39c53126924ed6) from Bitcoin Core is a great example of explaining what changed and why:
+
+```
+commit eb0b56b19017ab5c16c745e6da39c53126924ed6
+Author: Pieter Wuille <pieter.wuille@gmail.com>
+Date:   Fri Aug 1 22:57:55 2014 +0200
+
+   Simplify serialize.h's exception handling
+
+   Remove the 'state' and 'exceptmask' from serialize.h's stream
+   implementations, as well as related methods.
+
+   As exceptmask always included 'failbit', and setstate was always
+   called with bits = failbit, all it did was immediately raise an
+   exception. Get rid of those variables, and replace the setstate
+   with direct exception throwing (which also removes some dead
+   code).
+
+   As a result, good() is never reached after a failure (there are
+   only 2 calls, one of which is in tests), and can just be replaced
+   by !eof().
+
+   fail(), clear(n) and exceptions() are just never called. Delete
+   them.
+```
+
+Take a look at the full diff and just think how much time the author is saving fellow and future committers by taking the time to provide this context here and now. If he didn’t, it would probably be lost forever.
+
+The important thing here is to focus on making clear the reasons why you made the change in the first place—the way things worked before the change (and what was wrong with that), the way they work now, and why you decided to solve it the way you did.
+
+## 1.4 Creating Proper PR Titles
+
 
 
 ## 1.5 Sources:
-
 
 [Git Rebase in Depth](https://git-rebase.io/)
 
@@ -227,6 +376,8 @@ git push origin master --force
 [How to Review Pull Requests in Bitcoin Core](https://jonatack.github.io/articles/how-to-review-pull-requests-in-bitcoin-core)
 
 [How to update a forked repo with git rebase](https://medium.com/@topspinj/how-to-git-rebase-into-a-forked-repo-c9f05e821c8a)
+
+[How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/)
 
 [Git Reference](https://git-scm.com/docs/)
 
