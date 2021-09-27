@@ -1,10 +1,10 @@
 # Git Tutorial for Bitcoin Core
 
 - [1. Basic Operations](#1-basic-operations)
-- [2. Squashing and Rebasing](#2)
-- [3. Writing Good Commit messages](#3)
-- [4. Creating Proper Pull Requests](#4)
-- [5. Sources](#4)
+- [2. Squashing and Rebasing](#2-squashing-and-rebasing)
+- [3. Writing Good Commit messages](#3-writing-good-commit-messages  )
+- [4. Creating Proper Pull Requests](#4-creating-proper-pull-requests)
+- [5. Sources](#5-sources)
 
 ## 1. Basic Operations
 
