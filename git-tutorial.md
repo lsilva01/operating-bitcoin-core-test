@@ -1,12 +1,12 @@
-# 1. Git Tutorial for Bitcoin Core
+# Git Tutorial for Bitcoin Core
 
-- [1.1 Basic Operations](#1)
-- [1.2 Squashing and Rebasing](#2)
-- [1.3 Writing Good Commit messages](#3)
-- [1.4 Creating Proper PR Titles](#4)
-- [1.5 Sources](#4)
+- [1. Basic Operations](#1-basic-operations)
+- [2. Squashing and Rebasing](#2)
+- [3. Writing Good Commit messages](#3)
+- [4. Creating Proper Pull Requests](#4)
+- [5. Sources](#4)
 
-## 1.1 Basic Operations
+## 1. Basic Operations
 
 ### 1.1.1 Fork the Project
 
@@ -119,11 +119,11 @@ You can switch to a specific tag with the command. Useful when testing a version
 git checkout tags/v0.21.0
 ```
 
-## 1.2 Squashing and Rebasing
+## 2 Squashing and Rebasing
 
 Keeping commits organized is good practice. Usually after opening a PR, reviewers will make suggestions and the code will need to be changed. So, rather than adding new commits indiscriminately, `git rebase` can be used to organize these new commits in a coherent way.
 
-### 1.2.1 Amending your last commit
+### 2.1 Amending your last commit
 
 If the `--amend` option is used, the changes will be squashed into the most recent commit.
 This is the fastest way to merge two commits into one.
@@ -132,7 +132,7 @@ This is the fastest way to merge two commits into one.
 git commit -a --amend
 ```
 
-### 1.2.2 Fixing up older commits
+### 2.2 Fixing up older commits
 
 Amending only works for the most recent commit. But it's common to need to fix an older commit.
 
@@ -180,7 +180,7 @@ pick 0b9d0bb Add net.h
 
 After saving and closing the text editor, git will remove all these commits from its history and then execute each line, one at a time. Lines with the `pick` command will be kept. Those with `fixup` or `squash` will be squashed.
 
-### 1.2.3 Using git rebase --autosquash
+### 2.3 Using git rebase --autosquash
 
 The squashing can also be performed in a more automated manner by using the `--autosquash` option of `git rebase` in combination with the `--fixup` option of `git commit`:
 
@@ -194,7 +194,7 @@ This automatically generate the rebase script with commits reordered and actions
 
 `HEAD ~ 3` gets the last 3 commits. This value can be changed to an arbitrary number of commits
 
-### 1.2.4 Fetching Upstream Commits
+### 2.4 Fetching Upstream Commits
 
 When developing new features, it is common to need to fetch new commits from `bitcoin:master` and rewriting the local master with upstream's master.
 
@@ -213,13 +213,13 @@ To push the update to master, it may be necessary to force the push with `--forc
 $ git push origin master --force
 ```
 
-## 1.3 Writing Good Commit messages
+## 3 Writing Good Commit messages
 
 Good commit messages is one of most important aspect for a project maintainability. They allow new contributors to retrieve the context of a change and understand _what_ has changed and _why_.
 
 Therefore, a developer should not neglect good practices when writing commit messages. Some of them will be presented below.
 
-### 1.3.1 Separate subject from body with a blank line
+### 3.1 Separate subject from body with a blank line
 
 From the `git commit` manpage:
 
@@ -261,7 +261,7 @@ This entire message will be shown in the result of `git log` command.
 
 `git log --oneline` prints out just the subject line and `git shortlog` groups commits by user, again showing just the subject line for concision.
 
-### 1.3.2 Limit the subject line to 50 characters
+### 3.2 Limit the subject line to 50 characters
 
 50 characters is not a hard limit, just a rule of thumb. Keeping subject lines at this length ensures that they are readable, and forces the author to think for a moment about the most concise way to explain what’s going on.
 
@@ -289,7 +289,7 @@ f95b655ba Improve doc/i2p.md regarding I2P router options/versions
 59d4afc27 build: Bump version to 22.0rc3
 ```
 
-### 1.3.3 Capitalize the subject line
+### 3.3 Capitalize the subject line
 
 This is as simple as it sounds. Begin all subject lines with a capital letter.
 
@@ -309,13 +309,13 @@ Note that most of the above commit messages start with a capital letter, except 
 * `wallet` for changes to the wallet code
 * `build` for changes to the GNU Autotools or reproducible builds
 
-### 1.3.4 Do not end the subject line with a period
+### 3.4 Do not end the subject line with a period
 
 Trailing punctuation is unnecessary in subject lines. Besides, space is precious when you’re trying to keep them to 50 chars or less.
 
 This can be seen in the above commit message headers.
 
-### 1.3.5 Use the imperative mood in the subject line
+### 3.5 Use the imperative mood in the subject line
 
 Imperative mood just means “spoken or written as if giving a command or instruction”. A few examples:
 
@@ -325,13 +325,13 @@ Imperative mood just means “spoken or written as if giving a command or instru
 
 The use of the imperative is important only in the subject line. This restriction can be relaxed when writing the body.
 
-### 1.3.6 Wrap the body at 72 characters
+### 3.6 Wrap the body at 72 characters
 
 Git never wraps text automatically. When writing the body of a commit message, mind its right margin, and wrap text manually.
 
 The recommendation is to do this at 72 characters, so that Git has plenty of room to indent text while still keeping everything under 80 characters overall.
 
-### 1.3.7 Use the body to explain what and why vs. how
+### 3.7 Use the body to explain what and why vs. how
 
 The [commit eb0b56b](https://github.com/bitcoin/bitcoin/commit/eb0b56b19017ab5c16c745e6da39c53126924ed6) from Bitcoin Core is a great example of explaining what changed and why:
 
@@ -363,13 +363,61 @@ Take a look at the full diff and just think how much time the author is saving f
 
 The important thing here is to focus on making clear the reasons why you made the change in the first place—the way things worked before the change (and what was wrong with that), the way they work now, and why you decided to solve it the way you did.
 
-## 1.4 Creating Proper PR Titles
+## 4 Creating Proper Pull Requests
 
+### 4.1 Focus on a clear, minimal change
 
+It is important that the PR has a clear objective. This makes the review easier and reduces changes from introducing bugs.
 
-## 1.5 Sources:
+If the PR is too long, consider breaking them down into smaller ones.
+
+A good example of this is [PR 17728](https://github.com/bitcoin/bitcoin/pull/17728).
+
+### 4.2 Use the PR description to explain why
+
+The PR title and description is the first thing reviewers will see. Therefore, it is important that they present clarity and objectivity so that the reviewer can easily understand the PR motivations.
+
+The PR title should have the same prefixes presented in 1.3.3 section. They are described in Bitcoin Core contributing guide. The title of [PR 22732](https://github.com/bitcoin/bitcoin/pull/22732), for example, uses the prefix `net`.
+
+The same as for the commit applies here. PR text should focus on _why_, not _what_. Summarizing what was done is okay, but explaining the motivations and the problem that the RP solves is crucial.
+
+The text of [PR 22791](https://github.com/bitcoin/bitcoin/pull/22791), for example, explains the problem (how the bug was introduced) and the proposed solution.
+
+Including step-by-step instructions on how to review and test PR in the text is also interesting.
+
+### 4.3 Organize the commits coherently
+
+A PR can contain multiple commits. It is easier for the review to analyze each change separately.
+
+A good strategy for deciding the granularity of each commit is by functionality. For example, one changes the component, the other updates the documentation about this component, and another implements the tests for this component.
+
+A good example of this strategy is [PR 23065](https://github.com/bitcoin/bitcoin/pull/23065).
+
+```
+d96b000e9 (HEAD) Make GUI UTXO lock/unlock persistent
+077154fe6 Add release note for lockunspent change
+719ae927d Update lockunspent tests for lock persistence
+f13fc1629 Allow lockunspent to store the lock in the wallet DB
+c52789365 Allow locked UTXOs to be store in the wallet database
+```
+
+The 5 commits that make up this PR are logically divided. `c52789365` implements the proposed solution. `f13fc1629` updates the RPC. `719ae927d` updates the tests. `077154fe6` adds release note and `d96b000e9` implement the same solution in GUI.
+
+Separating commits this way is good practice and makes it a lot easier for reviewers.
+
+### 4.4 Create test coverage if necessary
+
+When adding a new feature, such as a new RPC, a test should be added.
+
+If the change occurs at the component level, unit testing is likely to be more appropriate. If it's at the resource level (something users interact with), then functional testing fits the case.
+
+An example of PR that does this is the [PR 14667](https://github.com/bitcoin/bitcoin/pull/14667), which added a new RPC and  funfional test for it.
+
+## 5 Sources:
 
 [Git Rebase in Depth](https://git-rebase.io/)
+
+[How to Contribute Pull Requests to Bitcoin Core](https://jonatack.github.io/articles/how-to-contribute-pull-requests-to-bitcoin-core)
 
 [How to create a pull request in GitHub](https://opensource.com/article/19/7/create-pull-request-github)
 
